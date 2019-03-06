@@ -16,7 +16,7 @@ df = pd.read_csv("house_data_small.csv")
 
 # Read data into dataframes
 X = df[["sq_feet", "num_bedrooms", "num_bathrooms"]].values
-Y = df[["sale_price"]]
+Y = df[["sale_price"]].values
 
 # Scale and normalise input
 # ret = ScaleAndNormalise( X )
@@ -24,8 +24,11 @@ Y = df[["sale_price"]]
 # X = np.insert( X, 0, 1, axis=1 )
 
 
-print(X)
-print(Y)
+print( "x=", X)
+print( "y=", Y)
+
+tx = X.transpose()
+print ("x transpose = ", tx)
 
 # for key, value in df.iteritems():
 #
