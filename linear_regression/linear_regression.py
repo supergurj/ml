@@ -15,30 +15,31 @@ def ScaleAndNormalise( v ):
 df = pd.read_csv("house_data_small.csv")
 
 # Read data into dataframes
-X = df[["sq_feet", "num_bedrooms", "num_bathrooms"]].values
-Y = df[["sale_price"]].values
+x = df[["sq_feet", "num_bedrooms", "num_bathrooms"]].values
+m = np.size(x, 0)
+n = np.size(x, 1)
+y = df[["sale_price"]].values
 
 # Scale and normalise input
-# ret = ScaleAndNormalise( X )
-# X = ret[0]
-# X = np.insert( X, 0, 1, axis=1 )
+ret = ScaleAndNormalise( x )
+x = ret[0]
+meanAndSum = ( ret[1], ret[2] )
 
+# Insert the leading column of 1's
+x = np.insert( x, 0, 1, axis=1 )
 
-print( "x=", X)
-print( "y=", Y)
+print( "x=", x)
+print( "y=", y)
 
-tx = X.transpose()
-print ("x transpose = ", tx)
+# Gradient descent
+theta = np.zeros( (n+1, 1) )
 
-# for key, value in df.iteritems():
-#
-#     mean = value.mean()
-#     range = value.max() - value.min()
-#
-#     print ( key, mean, range )
-#
-#     for i in range( dim[1] ):
-#         print ( v[ cur, i ] + ' ')
+for i in range( 0, 3000 ):
+    w = np.matmul( x.transpose(), np.matmul( x, theta) - y )
+    theta = theta - (0.1/m) * w
+
+print("theta = ", theta)
+print ( "result =", np.matmul( x, theta ))
 
 
 
