@@ -15,8 +15,9 @@ def ReadHousingData():
 def ReadExperimentalData():
     x = np.linspace(0, 100, 100)
     x.shape = (100, 1)
-
     y = x * x * x
+
+    x = np.append( x, x*x*x, axis=1 )
 
     return ( x, y )
 
@@ -51,15 +52,16 @@ n = x.shape[1]
 # Insert the leading column of 1's
 x = np.insert( x, 0, 1, axis=1 )
 
-print( "x=", x)
-print( "y=", y)
-
 # Gradient descent
 theta = np.zeros( (n+1, 1) )
 
-for i in range( 0, 3000 ):
+print( "x=\n", x)
+print( "y=\n", y)
+print( "theta=\n", theta )
+
+for i in range( 0, 100 ):
     w = np.matmul( x.transpose(), np.matmul( x, theta) - y )
-    theta = theta - (0.0001/m) * w
+    theta = theta - (0.000001/m) * w
 
 print("theta = ", theta)
 
@@ -68,6 +70,9 @@ print ( "result =", result )
 
 plt.figure()
 xaxis = x[:, 1]
+
+print( xaxis )
+
 plt.plot( xaxis, y, label="y" )
 plt.plot( xaxis, result, label = "result" )
 plt.legend()
