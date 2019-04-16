@@ -2,6 +2,8 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
+import random
+import math
 
 def ReadHousingData():
     # Load csv file
@@ -13,11 +15,20 @@ def ReadHousingData():
     return ( x, y )
 
 def ReadExperimentalData():
-    x = np.linspace(0, 100, 100)
+
+    x = np.linspace(0, 10, 100)
     x.shape = (100, 1)
+
     y = x * x * x
 
-    x = np.append( x, x*x*x*x, axis=1 )
+    # Perturb
+    z = np.linspace( 0, 720, 100 ) * ( math.pi / 180.0 )
+    z = np.sin( z ) * 100.0
+    z.shape = ( 100, 1 )
+
+    y = y + z
+
+    x = np.append( x, x * x, axis=1 )
 
     return ( x, y )
 
