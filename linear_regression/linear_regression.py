@@ -2,7 +2,6 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
-import random
 import math
 
 def ReadHousingData():
@@ -16,21 +15,62 @@ def ReadHousingData():
 
 def ReadExperimentalData():
 
-    x = np.linspace(0, 10, 100)
+    x = np.linspace(0, 1, 100)
     x.shape = (100, 1)
 
     y = x * x * x
 
     # Perturb
     z = np.linspace( 0, 720, 100 ) * ( math.pi / 180.0 )
-    z = np.sin( z ) * 100.0
+    z = np.sin( z ) * 0.75
     z.shape = ( 100, 1 )
 
     y = y + z
 
-    x = np.append( x, x * x, axis=1 )
+    # Add in higher orders of x
+    xOrig = x
+    xx = x
+    for i in range ( 0, 100 ):
+        xx = xx * xOrig
+        x = np.append( x, xx, axis=1 )
 
     return ( x, y )
+
+def CheckDimensions( x, y ):
+    assert len( x.shape ) == 2
+    assert len( y.shape ) == 2
+    assert x.shape[0] == y.shape[0]
+    assert y.shape[1] == 1
+    return
+
+def SplitDatasetIntoTrainingAndTest( x, y, testPercentage ):
+
+    # work out how many samples to use for test data
+    m = x.shape[0]
+    n = x.shape[1]
+    numTestSamples = int( m * ( testPercentage / 100.0 ) )
+
+    print( "m = %d, num test samples = %d\n" %(m, numTestSamples ) )
+
+    xTraining = x
+    yTraining = y
+
+    xTest = np.empty( (numTestSamples, n) )
+    yTest = np.empty( (numTestSamples, 1) )
+
+    # randomly extract rows as test samples
+    for i in range (0, numTestSamples):
+        row = np.random.randint( 0, m )
+
+        xTest[i:i+1:,] = xTraining[row:row+1:,]
+        yTest[i:i+1:,] = yTraining[row:row+1:,]
+
+        xTraining = np.delete( xTraining, row, 0 )
+        yTraining = np.delete( yTraining, row, 0 )
+
+        m = xTraining.shape[0]
+
+    return ( xTraining, yTraining, xTest, yTest)
 
 def ScaleAndNormalise( v ):
 
@@ -57,10 +97,17 @@ input = ReadExperimentalData()
 # Set up x and y
 x = input[0]
 y = input[1]
+CheckDimensions( x, y )
 
-# Check dimensions
-assert len( x.shape ) == 2
-assert x.shape[0] == y.shape[0]
+# Split data into training and testing sets
+splitData = SplitDatasetIntoTrainingAndTest( x, y, 20 )
+x = splitData[0]
+y = splitData[1]
+CheckDimensions( x, y )
+
+xTest = splitData[2]
+yTest = splitData[3]
+CheckDimensions( xTest, yTest )
 
 m = x.shape[0]
 n = x.shape[1]
@@ -83,9 +130,9 @@ theta = np.zeros( (n+1, 1) )
 
 ALPHA_START = 10.0
 ALPHA_SCALE = 0.5
-ALPHA_MIN = 0.00001
+ALPHA_MIN = 1.0e-4
 TERM_MAX_ITERATIONS = 10000000
-TERM_MIN_ERROR_RELATIVE_DELTA = 0.0000001
+TERM_MIN_ERROR_RELATIVE_DELTA = 1.0e-6
 
 j = ComputeJ( x, theta, y, m )
 alpha = ALPHA_START
