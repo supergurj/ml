@@ -15,10 +15,10 @@ def CheckDimensions( x, y ):
 def ReadExperimentalData():
 
     maxX = 10
-    numSteps = 10
+    numSteps = 50
 
     x = np.linspace(0, maxX, numSteps)
-    x.shape = (maxX, 1)
+    x.shape = (numSteps, 1)
 
     y = x
 
@@ -65,11 +65,7 @@ def SplitDatasetIntoTrainingAndTest( x, y, testPercentage ):
 
         m = xTraining.shape[0]
 
-    print ( "xTraining = \n", xTraining )
-    print ( "xTest = \n", xTest )
-
-    print ( "yTraining = \n", yTraining )
-    print ( "yTest = \n", yTest )
+    return ( xTraining, yTraining, xTest, yTest )
 
 
 inputData = ReadExperimentalData()
@@ -79,5 +75,29 @@ x = inputData[0]
 y = inputData[1]
 
 CheckDimensions( x, y )
-SplitDatasetIntoTrainingAndTest( x, y, 50 )
 
+# Split data into training and testing sets
+splitData = SplitDatasetIntoTrainingAndTest( x, y, 50 )
+
+x = splitData[0]
+y = splitData[1]
+CheckDimensions( x, y )
+
+xTest = splitData[2]
+yTest = splitData[3]
+CheckDimensions( xTest, yTest )
+
+print( xTest )
+print( xTest[ xTest[:,0].argsort()] )
+
+plt.figure()
+
+# print("theta = ", theta)
+# print ( "result =", result )
+# print( xaxis )
+
+plt.plot( x[:, 0], y, "b.", label="y" )
+plt.plot( xTest[:,0], yTest, "go", label="test")
+
+plt.legend()
+plt.show()
