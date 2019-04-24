@@ -15,22 +15,24 @@ def ReadHousingData():
 
 def ReadExperimentalData():
 
-    x = np.linspace(0, 1, 100)
-    x.shape = (100, 1)
+    m = 100
+    x = np.linspace(0, 1, m)
+    x.shape = (m, 1)
 
     y = x * x * x
 
     # Perturb
-    z = np.linspace( 0, 720, 100 ) * ( math.pi / 180.0 )
+    z = np.linspace( 0, 720, m ) * ( math.pi / 180.0 )
     z = np.sin( z ) * 0.75
-    z.shape = ( 100, 1 )
+    z.shape = ( m, 1 )
 
     y = y + z
 
     # Add in higher orders of x
+    numHigherOrders = 50
     xOrig = x
     xx = x
-    for i in range ( 0, 100 ):
+    for i in range ( 0, numHigherOrders ):
         xx = xx * xOrig
         x = np.append( x, xx, axis=1 )
 
@@ -70,7 +72,7 @@ def SplitDatasetIntoTrainingAndTest( x, y, testPercentage ):
 
         m = xTraining.shape[0]
 
-    return ( xTraining, yTraining, xTest, yTest)
+    return ( xTraining, yTraining, xTest, yTest )
 
 def ScaleAndNormalise( v ):
 
@@ -99,26 +101,30 @@ x = input[0]
 y = input[1]
 CheckDimensions( x, y )
 
-# Split data into training and testing sets
-splitData = SplitDatasetIntoTrainingAndTest( x, y, 20 )
-x = splitData[0]
-y = splitData[1]
-CheckDimensions( x, y )
-
-xTest = splitData[2]
-yTest = splitData[3]
-CheckDimensions( xTest, yTest )
-
-m = x.shape[0]
-n = x.shape[1]
-
 # Scale and normalise input
 ret = ScaleAndNormalise( x )
 x = ret[0]
 meanAndSum = ( ret[1], ret[2] )
+m = x.shape[0]
+n = x.shape[1]
+
+# Split data into training and testing sets
+splitData = SplitDatasetIntoTrainingAndTest( x, y, 20 )
+
+x = splitData[0]
+y = splitData[1]
+CheckDimensions( x, y )
+m = x.shape[0]
+n = x.shape[1]
+
+xTest = splitData[2]
+yTest = splitData[3]
+CheckDimensions( xTest, yTest )
+assert xTest.shape[1] == n
 
 # Insert the leading column of 1's
 x = np.insert( x, 0, 1, axis=1 )
+xTest = np.insert( xTest, 0, 1, axis=1 )
 
 # Set up initial theta
 theta = np.zeros( (n+1, 1) )
@@ -131,8 +137,8 @@ theta = np.zeros( (n+1, 1) )
 ALPHA_START = 10.0
 ALPHA_SCALE = 0.5
 ALPHA_MIN = 1.0e-4
-TERM_MAX_ITERATIONS = 10000000
-TERM_MIN_ERROR_RELATIVE_DELTA = 1.0e-6
+TERM_MAX_ITERATIONS = 100000000
+TERM_MIN_ERROR_RELATIVE_DELTA = 1.0e-8
 
 j = ComputeJ( x, theta, y, m )
 alpha = ALPHA_START
@@ -173,17 +179,21 @@ while 1:
 
 
 
-result = np.matmul( x, theta )
+fig, axs = plt.subplots( 2, 1)
 
-plt.figure()
 xaxis = x[:, 1]
+result = np.matmul( x, theta )
+axs[0].plot( xaxis, y, "b.", label="y" )
+axs[0].plot( xaxis, result, "orange",  label = "result" )
 
-# print("theta = ", theta)
-# print ( "result =", result )
-# print( xaxis )
+sortIdx = xTest[:,1].argsort()
+xTest = xTest[ sortIdx ]
+yTest = yTest[ sortIdx ]
+xaxis = xTest[:, 1]
+r = np.matmul( xTest, theta )
+axs[1].plot( xaxis, yTest, "g.", label="test")
+axs[1].plot( xaxis, r, "orange",  label = "result" )
 
-plt.plot( xaxis, y, label="y" )
-plt.plot( xaxis, result, label = "result" )
 plt.legend()
 plt.show()
 
