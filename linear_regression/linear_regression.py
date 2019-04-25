@@ -22,11 +22,11 @@ def ReadExperimentalData():
     y = x * x * x
 
     # Perturb
-    # z = np.linspace( 0, 720, m ) * ( math.pi / 180.0 )
-    # z = np.sin( z ) * 0.75
-    # z.shape = ( m, 1 )
-    #
-    # y = y + z
+    z = np.linspace( 0, 2000, m ) * ( math.pi / 180.0 )
+    z = np.sin( z ) * 0.75
+    z.shape = ( m, 1 )
+
+    y = y + z
 
     # Add in higher orders of x
     numHigherOrders = 50
@@ -138,7 +138,7 @@ ALPHA_START = 10.0
 ALPHA_SCALE = 0.5
 ALPHA_MIN = 1.0e-4
 TERM_MAX_ITERATIONS = 10000000
-TERM_MIN_ERROR_RELATIVE_DELTA = 1.0e-12
+TERM_MIN_ERROR_RELATIVE_DELTA = 1.0e-10
 
 j = ComputeJ( x, theta, y, m )
 alpha = ALPHA_START
