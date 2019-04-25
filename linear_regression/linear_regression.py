@@ -22,11 +22,11 @@ def ReadExperimentalData():
     y = x * x * x
 
     # Perturb
-    z = np.linspace( 0, 720, m ) * ( math.pi / 180.0 )
-    z = np.sin( z ) * 0.75
-    z.shape = ( m, 1 )
-
-    y = y + z
+    # z = np.linspace( 0, 720, m ) * ( math.pi / 180.0 )
+    # z = np.sin( z ) * 0.75
+    # z.shape = ( m, 1 )
+    #
+    # y = y + z
 
     # Add in higher orders of x
     numHigherOrders = 50
@@ -137,11 +137,16 @@ theta = np.zeros( (n+1, 1) )
 ALPHA_START = 10.0
 ALPHA_SCALE = 0.5
 ALPHA_MIN = 1.0e-4
-TERM_MAX_ITERATIONS = 100000000
-TERM_MIN_ERROR_RELATIVE_DELTA = 1.0e-8
+TERM_MAX_ITERATIONS = 10000000
+TERM_MIN_ERROR_RELATIVE_DELTA = 1.0e-12
 
 j = ComputeJ( x, theta, y, m )
 alpha = ALPHA_START
+
+jTrace = []
+alphaTrace = []
+numTraces = 0
+traceInterval = 1000 # sample data each time after this many interations
 
 numIter = 0
 while 1:
@@ -157,29 +162,37 @@ while 1:
 
         # Check for termination
         if ( (j - jNew) / j ) < TERM_MIN_ERROR_RELATIVE_DELTA :
-            print( "Terminating after relative error decreasing below threshold.\n")
+            print( "Terminating after relative error decreasing below threshold.")
             break
 
         if ( numIter > TERM_MAX_ITERATIONS ) :
-            print( "Terminating after %d iterations.\n" % numIter )
+            print( "Terminating after %d iterations." % numIter )
             break
 
-        j = jNew
-        numIter = numIter + 1
+        alpha = alpha * 1.1
 
     else:
 
         if ( alpha < ALPHA_MIN ):
             # Time to quit
-            print( "Terminating after relative error started increasing with min alpha.\n")
+            print( "Terminating after relative error started increasing with min alpha.")
             break
         else:
             # Try smaller step
             alpha = alpha * 0.5
 
+    j = jNew
+    numIter = numIter + 1
 
+    if ( (numIter % traceInterval) == 0 ):
+        jTrace.append( j )
+        alphaTrace.append( alpha )
+        numTraces = numTraces + 1
 
-fig, axs = plt.subplots( 2, 1)
+print( numIter, "iterations" )
+print ( "error = ", j )
+
+fig, axs = plt.subplots( 4, 1)
 
 xaxis = x[:, 1]
 result = np.matmul( x, theta )
@@ -193,6 +206,13 @@ xaxis = xTest[:, 1]
 r = np.matmul( xTest, theta )
 axs[1].plot( xaxis, yTest, "g.", label="test")
 axs[1].plot( xaxis, r, "orange",  label = "result" )
+
+if numTraces > 0:
+    xaxis = np.linspace( 0, numTraces, numTraces )
+    jArr = np.array( jTrace )
+    alphaArr = np.array( alphaTrace )
+    axs[2].plot( xaxis, jArr, "red", label="j" )
+    axs[3].plot( xaxis, alphaArr, "green", label="alpha" )
 
 plt.legend()
 plt.show()
