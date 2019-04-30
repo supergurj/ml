@@ -4,6 +4,12 @@ import matplotlib.pyplot as plt
 import sys
 import math
 
+ALPHA_START = 10.0
+ALPHA_SCALE = 0.5
+ALPHA_MIN = 1.0e-4
+TERM_MAX_ITERATIONS = 10000000
+TERM_MIN_ERROR_RELATIVE_DELTA = 1.0e-4
+
 def ReadHousingData():
     # Load csv file
     df = pd.read_csv("house_data_small.csv")
@@ -15,21 +21,21 @@ def ReadHousingData():
 
 def ReadExperimentalData():
 
-    m = 100
+    m = 20
     x = np.linspace(0, 1, m)
     x.shape = (m, 1)
 
-    y = x * x * x
+    y = ( x * 2 ) - 1
+    y = y * y
 
     # Perturb
-    z = np.linspace( 0, 2000, m ) * ( math.pi / 180.0 )
-    z = np.sin( z ) * 0.75
+    z = ( 90 + np.linspace( 0, 360, m ) ) * ( math.pi / 180.0 );
     z.shape = ( m, 1 )
-
-    y = y + z
+    z = np.sin( z )
+    y = y * z
 
     # Add in higher orders of x
-    numHigherOrders = 50
+    numHigherOrders = 5
     xOrig = x
     xx = x
     for i in range ( 0, numHigherOrders ):
@@ -63,6 +69,8 @@ def SplitDatasetIntoTrainingAndTest( x, y, testPercentage ):
     # randomly extract rows as test samples
     for i in range (0, numTestSamples):
         row = np.random.randint( 0, m )
+
+        print ( row )
 
         xTest[i:i+1:,] = xTraining[row:row+1:,]
         yTest[i:i+1:,] = yTraining[row:row+1:,]
@@ -109,7 +117,7 @@ m = x.shape[0]
 n = x.shape[1]
 
 # Split data into training and testing sets
-splitData = SplitDatasetIntoTrainingAndTest( x, y, 20 )
+splitData = SplitDatasetIntoTrainingAndTest( x, y, 30 )
 
 x = splitData[0]
 y = splitData[1]
@@ -133,13 +141,6 @@ theta = np.zeros( (n+1, 1) )
 # print( "y=\n", y)
 
 # Gradient descent
-
-ALPHA_START = 10.0
-ALPHA_SCALE = 0.5
-ALPHA_MIN = 1.0e-4
-TERM_MAX_ITERATIONS = 10000000
-TERM_MIN_ERROR_RELATIVE_DELTA = 1.0e-10
-
 j = ComputeJ( x, theta, y, m )
 alpha = ALPHA_START
 
@@ -161,7 +162,7 @@ while 1:
         theta = thetaNew
 
         # Check for termination
-        if ( (j - jNew) / j ) < TERM_MIN_ERROR_RELATIVE_DELTA :
+        if (  jNew < TERM_MIN_ERROR_RELATIVE_DELTA ) :
             print( "Terminating after relative error decreasing below threshold.")
             break
 
@@ -192,6 +193,9 @@ while 1:
 print( numIter, "iterations" )
 print ( "error = ", j )
 
+j = ComputeJ( xTest, theta, yTest, xTest.shape[0] )
+print( "result error = ", j)
+
 fig, axs = plt.subplots( 4, 1)
 
 xaxis = x[:, 1]
@@ -203,9 +207,11 @@ sortIdx = xTest[:,1].argsort()
 xTest = xTest[ sortIdx ]
 yTest = yTest[ sortIdx ]
 xaxis = xTest[:, 1]
-r = np.matmul( xTest, theta )
+
+result = np.matmul( xTest, theta )
 axs[1].plot( xaxis, yTest, "g.", label="test")
-axs[1].plot( xaxis, r, "orange",  label = "result" )
+axs[1].plot( xaxis, result, "orange",  label = "result" )
+
 
 if numTraces > 0:
     xaxis = np.linspace( 0, numTraces, numTraces )
