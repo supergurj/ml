@@ -9,6 +9,7 @@ ALPHA_SCALE = 0.5
 ALPHA_MIN = 1.0e-4
 TERM_MAX_ITERATIONS = 10000000
 TERM_MIN_ERROR_RELATIVE_DELTA = 1.0e-4
+LAMBDA = 1000
 
 def ReadHousingData():
     # Load csv file
@@ -136,6 +137,11 @@ xTest = np.insert( xTest, 0, 1, axis=1 )
 
 # Set up initial theta
 theta = np.zeros( (n+1, 1) )
+
+# Set up lambda
+l = np.ones( (n+1, 1) )
+l[0][0] = 0
+l = (1/m) * l
 
 # print( "x=\n", x)
 # print( "y=\n", y)
