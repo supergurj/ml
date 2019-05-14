@@ -9,7 +9,7 @@ ALPHA_SCALE = 0.5
 ALPHA_MIN = 1.0e-4
 TERM_MAX_ITERATIONS = 10000000
 TERM_MIN_ERROR_RELATIVE_DELTA = 1.0e-4
-LAMBDA = 1000
+LAMBDA = 0.00001
 
 def ReadHousingData():
     # Load csv file
@@ -36,7 +36,7 @@ def ReadExperimentalData():
     y = y * z
 
     # Add in higher orders of x
-    numHigherOrders = 5
+    numHigherOrders = 50
     xOrig = x
     xx = x
     for i in range ( 0, numHigherOrders ):
@@ -141,7 +141,7 @@ theta = np.zeros( (n+1, 1) )
 # Set up lambda
 l = np.ones( (n+1, 1) )
 l[0][0] = 0
-l = (1/m) * l
+l = (LAMBDA/m) * l
 
 # print( "x=\n", x)
 # print( "y=\n", y)
@@ -158,8 +158,9 @@ traceInterval = 1000 # sample data each time after this many interations
 numIter = 0
 while 1:
 
+    ll = 1 - alpha * l
     w = np.matmul( x.transpose(), np.matmul( x, theta) - y )
-    thetaNew = theta - (alpha/m) * w
+    thetaNew = (ll * theta) - ( (alpha/m) * w )
     jNew = ComputeJ( x, thetaNew, y, m )
 
     if ( jNew < j ):

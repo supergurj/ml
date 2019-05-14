@@ -11,5 +11,10 @@ l = np.ones( (n+1, 1))
 l[0][0] = 0
 l = (1/m) * l
 
+ll = 1 - 5 * l
+
 
 print( l )
+print( ll )
+
+print ( l * ll )
