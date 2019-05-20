@@ -18,3 +18,12 @@ print( l )
 print( ll )
 
 print ( l * ll )
+
+def test( val ):
+    val = 10
+
+v = 1
+test( v )
+print ( v )
+
+
