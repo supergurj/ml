@@ -6,7 +6,62 @@ ALPHA_MIN = 1.0e-4
 TERM_MAX_ITERATIONS = 10000000
 TERM_MIN_ERROR_RELATIVE_DELTA = 1.0e-4
 
+def CheckDimensions( x, y ):
+    assert len( x.shape ) == 2
+    assert len( y.shape ) == 2
+
+    assert x.shape[0] == y.shape[0]
+    assert y.shape[1] == 1
+    return
+
+def SplitDatasetIntoTrainingAndTest( x, y, testPercentage ):
+
+    # work out how many samples to use for test data
+    m = x.shape[0]
+    n = x.shape[1]
+    numTestSamples = int( m * ( testPercentage / 100.0 ) )
+
+    print( "m = %d, num test samples = %d\n" %(m, numTestSamples ) )
+
+    xTraining = x
+    yTraining = y
+
+    xTest = np.empty( (numTestSamples, n) )
+    yTest = np.empty( (numTestSamples, 1) )
+
+    # randomly extract rows as test samples
+    for i in range (0, numTestSamples):
+        row = np.random.randint( 0, m )
+
+        print ( row )
+
+        xTest[i:i+1:,] = xTraining[row:row+1:,]
+        yTest[i:i+1:,] = yTraining[row:row+1:,]
+
+        xTraining = np.delete( xTraining, row, 0 )
+        yTraining = np.delete( yTraining, row, 0 )
+
+        m = xTraining.shape[0]
+
+    return ( xTraining, yTraining, xTest, yTest )
+
+def ScaleAndNormalise( v ):
+
+    mean = np.mean(v, axis=0)
+    sum = np.sum(v, axis=0)
+
+    v = np.subtract(v, mean)
+    v = np.divide(v, sum)
+
+    return (v, mean, sum )
+
 def GradientDescent( x, y, theta, regLambda, ComputeJ ):
+
+    CheckDimensions( x, y )
+
+    assert len(theta.shape) == 2
+    assert x.shape[1] == theta.shape[0]
+    assert theta.shape[1] == 1
 
     m = x.shape[0]
     n = x.shape[1] - 1
