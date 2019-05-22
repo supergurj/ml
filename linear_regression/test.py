@@ -4,26 +4,32 @@ import matplotlib.pyplot as plt
 import sys
 import math
 
-n = 5
 m = 10
+x = np.zeros((m, 4))
+y = np.zeros((m, 1))
 
-l = np.ones( (n+1, 1))
-l[0][0] = 0
-l = (1/m) * l
+numInside = 0
 
-ll = 1 - 5 * l
+for i in range( m ):
+    ang = np.random.random_sample() * 2.0 * np.pi
+    radius = math.sqrt( np.random.random_sample() ) * math.sqrt( 2.0 )
+    px = radius * math.cos( ang )
+    py = radius * math.sin( ang )
 
+    x[i][0] = px
+    x[i][1] = py
+    x[i][2] = px * px
+    x[i][3] = py * py
 
-print( l )
-print( ll )
+    if ( math.sqrt( (px * px) + (py * py) ) <= 1.0 ):
+        y[i][0] = 1.0
+        numInside = numInside + 1
 
-print ( l * ll )
+print( numInside )
+print ( x )
+print ( y )
 
-def test( val ):
-    val = 10
+xaxis = x[:, 0]
+print ( xaxis )
 
-v = 1
-test( v )
-print ( v )
-
-
+print( xaxis[ y[:,0] > 0 ] )
