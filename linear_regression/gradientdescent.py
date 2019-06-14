@@ -77,13 +77,14 @@ def GradientDescent( x, y, theta, regLambda, ComputeJ ):
     jTrace = []
     alphaTrace = []
     numTraces = 0
-    traceInterval = 1000 # sample data each time after this many interations
+    traceInterval = 1000 # sample data each time after this many iterations
 
     numIter = 0
     while 1:
 
         ll = 1 - alpha * l
-        w = np.matmul( x.transpose(), np.matmul( x, theta) - y )
+        h = ComputeH( x, theta )    # Linear Regression: np.matmul( x, theta)
+        w = np.matmul( x.transpose(), h - y )
         thetaNew = (ll * theta) - ( (alpha/m) * w )
         jNew = ComputeJ( x, thetaNew, y, m )
 

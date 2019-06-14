@@ -4,32 +4,54 @@ import matplotlib.pyplot as plt
 import sys
 import math
 
-m = 10
-x = np.zeros((m, 4))
-y = np.zeros((m, 1))
+def ComputeJ( y, h, l, theta ):
+    m = y.shape[0]
+    j = -(1/m) * ( np.matmul( y.transpose(), np.log(h) ) + np.matmul( (1-y).transpose(), np.log( 1-h ) ) )
+    j = j + ( (1/(2*m)) * ( np.matmul( l.transpose(), theta*theta)) )
+    return j
 
-numInside = 0
+# m=20
+# x = np.linspace( -10, 10, num = m )
+# x.shape = (m,1)
+#
+# h = 1 / ( 1 + np.exp(-x))
+#
+# plt.plot( x, h )
+#
+# y = np.ones( ( m, 1))
+# y[0:(m>>1)] = 0
+#
+# # print ( y )
+#
+# j = ComputeJ( y, h)
+# print (j )
+#
+# y[0:(m>>1)] = 1
+# y[(m>>1):m] = 0
+#
+# j = ComputeJ( y, h)
+# print (j )
+#
+# plt.show()
 
-for i in range( m ):
-    ang = np.random.random_sample() * 2.0 * np.pi
-    radius = math.sqrt( np.random.random_sample() ) * math.sqrt( 2.0 )
-    px = radius * math.cos( ang )
-    py = radius * math.sin( ang )
+h = np.ones( (1,1) )
+y = np.ones( (1,1) )
 
-    x[i][0] = px
-    x[i][1] = py
-    x[i][2] = px * px
-    x[i][3] = py * py
+h[:,:] = 0.9999999999999
+# print( -np.log(1-h) )
+y[:,:] = 0
 
-    if ( math.sqrt( (px * px) + (py * py) ) <= 1.0 ):
-        y[i][0] = 1.0
-        numInside = numInside + 1
+# j = ComputeJ( y, h)
+# print (j)
 
-print( numInside )
-print ( x )
-print ( y )
+l = np.ones( 10 )
+l.shape = (10,1)
+l[0] = 0
 
-xaxis = x[:, 0]
-print ( xaxis )
+theta = np.linspace( 1, 10, 10 )
+theta.shape = (10,1)
+# print ( theta * theta)
+# print( l.transpose() )
+# print (theta)
 
-print( xaxis[ y[:,0] > 0 ] )
+print ( np.matmul( l.transpose(), theta ))

@@ -35,25 +35,40 @@ def ReadExperimentalData():
 
 def DrawExperimentalData( x, y ):
 
-    fig, axs = plt.subplots( 1, 1)
+    fig, axs = plt.subplots( 2, 1)
 
     xaxis = x[:,1]
     xaxis = xaxis[ y[:,0] > 0 ]
     yaxis = x[:,2]
     yaxis = yaxis[ y[:,0] > 0 ]
 
-    axs.plot( xaxis, yaxis, "or", label="y" )
-    axs.axis( 'equal')
+    axs[0].plot( xaxis, yaxis, "og", label="y" )
+    axs[0].axis( 'equal')
+
+    # The points outside
+    xaxis = x[:,1]
+    xaxis = xaxis[ y[:,0] < 1 ]
+    yaxis = x[:,2]
+    yaxis = yaxis[ y[:,0] < 1 ]
+
+    axs[1].plot( xaxis, yaxis, "or", label="y" )
+    axs[1].axis( 'equal')
 
     plt.legend()
     plt.show()
 
-# def ComputeJ( x, theta, y, m ):
-#
-#     err = np.matmul( x, theta) - y
-#     err.shape = ( m, )  # Convert to 1D array
-#     j = np.dot( err, err ) * (0.5/m)
-#     return j
+def ComputeH( x, theta ):
+    # returns ( m x [1+n] ) x ( [n+1] x 1 )  = (mx1) matrix
+    z = np.matmul( x, theta )
+    h = 1 / ( 1 + np.exp( -z ) )
+    return h
+
+def ComputeJ( x, theta, y, m ):
+
+    h = ComputeH( x, theta )
+    err.shape = ( m, )  # Convert to 1D array
+    j = np.dot( err, err ) * (0.5/m)
+    return j
 
 
 # Read input as tuple of np arrays
