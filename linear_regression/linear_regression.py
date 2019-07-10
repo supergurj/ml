@@ -90,32 +90,7 @@ theta = GradientDescent( x, y, theta, LAMBDA, ComputeJ )
 j = ComputeJ( xTest, theta, yTest, xTest.shape[0] )
 print( "result error = ", j)
 
-fig, axs = plt.subplots( 4, 1)
 
-xaxis = x[:, 1]
-result = np.matmul( x, theta )
-axs[0].plot( xaxis, y, "b.", label="y" )
-axs[0].plot( xaxis, result, "orange",  label = "result" )
-
-sortIdx = xTest[:,1].argsort()
-xTest = xTest[ sortIdx ]
-yTest = yTest[ sortIdx ]
-xaxis = xTest[:, 1]
-
-result = np.matmul( xTest, theta )
-axs[1].plot( xaxis, yTest, "g.", label="test")
-axs[1].plot( xaxis, result, "orange",  label = "result" )
-
-
-# if numTraces > 0:
-#     xaxis = np.linspace( 0, numTraces, numTraces )
-#     jArr = np.array( jTrace )
-#     alphaArr = np.array( alphaTrace )
-#     axs[2].plot( xaxis, jArr, "red", label="j" )
-#     axs[3].plot( xaxis, alphaArr, "green", label="alpha" )
-
-plt.legend()
-plt.show()
 
 
 

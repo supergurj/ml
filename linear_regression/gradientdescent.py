@@ -122,4 +122,14 @@ def GradientDescent( x, y, theta, regLambda, ComputeJ ):
             alphaTrace.append( alpha )
             numTraces = numTraces + 1
 
+    if numTraces > 0:
+        fig, axs = plt.subplots( 2, 1)
+        xaxis = np.linspace( 0, numTraces, numTraces )
+        jArr = np.array( jTrace )
+        alphaArr = np.array( alphaTrace )
+        axs[0].plot( xaxis, jArr, "red", label="j" )
+        axs[1].plot( xaxis, alphaArr, "green", label="alpha" )
+        plt.legend()
+        plt.show()
+
     return theta

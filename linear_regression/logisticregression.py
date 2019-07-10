@@ -63,11 +63,10 @@ def ComputeH( x, theta ):
     h = 1 / ( 1 + np.exp( -z ) )
     return h
 
-def ComputeJ( x, theta, y, m ):
-
-    h = ComputeH( x, theta )
-    err.shape = ( m, )  # Convert to 1D array
-    j = np.dot( err, err ) * (0.5/m)
+def ComputeJ( y, h, l, theta ):
+    m = y.shape[0]
+    j = -(1/m) * ( np.matmul( y.transpose(), np.log(h) ) + np.matmul( (1-y).transpose(), np.log( 1-h ) ) )
+    j = j + ( (1/(2*m)) * ( np.matmul( l.transpose(), theta*theta)) )
     return j
 
 
@@ -109,13 +108,13 @@ print (x, y)
 print (xTest, yTest)
 DrawExperimentalData( x, y )
 
-# # Set up initial theta
-# theta = np.zeros( (n+1, 1) )
-#
-# # print( "x=\n", x)
-# # print( "y=\n", y)
-#
-# theta = GradientDescent( x, y, theta, LAMBDA, ComputeJ )
+# Set up initial theta
+theta = np.zeros( (n+1, 1) )
+
+# print( "x=\n", x)
+# print( "y=\n", y)
+
+theta = GradientDescent( x, y, theta, LAMBDA, ComputeJ )
 #
 # # print( numIter, "iterations" )
 # # print ( "error = ", j )
