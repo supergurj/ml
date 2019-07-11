@@ -30,11 +30,12 @@ def ReadExperimentalData():
             y[i][0] = 1.0
             numInside = numInside + 1
 
-    print( numInside )
+    # print( numInside )
     return (x,y)
 
 def DrawExperimentalData( x, y ):
 
+    # plt.figure()
     fig, axs = plt.subplots( 2, 1)
 
     xaxis = x[:,1]
@@ -63,12 +64,17 @@ def ComputeH( x, theta ):
     h = 1 / ( 1 + np.exp( -z ) )
     return h
 
-def ComputeJ( y, h, l, theta ):
-    m = y.shape[0]
-    j = -(1/m) * ( np.matmul( y.transpose(), np.log(h) ) + np.matmul( (1-y).transpose(), np.log( 1-h ) ) )
-    j = j + ( (1/(2*m)) * ( np.matmul( l.transpose(), theta*theta)) )
-    return j
+# def ComputeJ( y, h, l, theta ):
+#     m = y.shape[0]
+#     j = -(1/m) * ( np.matmul( y.transpose(), np.log(h) ) + np.matmul( (1-y).transpose(), np.log( 1-h ) ) )
+#     j = j + ( (1/(2*m)) * ( np.matmul( l.transpose(), theta*theta)) )
+#     return j
 
+def ComputeJ( x, theta, y ):
+    # y, h: (mx1)
+    h = ComputeH( x, theta )
+    j = -(1/m) * ( np.matmul( y.transpose(), np.log(h) ) + np.matmul( (1-y).transpose(), np.log( 1-h ) ) )
+    return j
 
 # Read input as tuple of np arrays
 # input = ReadHousingData()
@@ -104,9 +110,10 @@ assert xTest.shape[1] == n
 x = np.insert( x, 0, 1, axis=1 )
 xTest = np.insert( xTest, 0, 1, axis=1 )
 
-print (x, y)
-print (xTest, yTest)
+# print (x, y)
+# print (xTest, yTest)
 DrawExperimentalData( x, y )
+DrawExperimentalData( xTest, yTest )
 
 # Set up initial theta
 theta = np.zeros( (n+1, 1) )
@@ -114,7 +121,7 @@ theta = np.zeros( (n+1, 1) )
 # print( "x=\n", x)
 # print( "y=\n", y)
 
-theta = GradientDescent( x, y, theta, LAMBDA, ComputeJ )
+theta = GradientDescent( x, y, theta, ComputeJ, ComputeH )
 #
 # # print( numIter, "iterations" )
 # # print ( "error = ", j )

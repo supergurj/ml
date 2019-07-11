@@ -2,7 +2,7 @@ import numpy as np
 
 ALPHA_START = 10.0
 ALPHA_SCALE = 0.5
-ALPHA_MIN = 1.0e-4
+ALPHA_MIN = 1.0e-6
 TERM_MAX_ITERATIONS = 10000000
 TERM_MIN_ERROR_RELATIVE_DELTA = 1.0e-4
 
@@ -21,7 +21,7 @@ def SplitDatasetIntoTrainingAndTest( x, y, testPercentage ):
     n = x.shape[1]
     numTestSamples = int( m * ( testPercentage / 100.0 ) )
 
-    print( "m = %d, num test samples = %d\n" %(m, numTestSamples ) )
+    # print( "m = %d, num test samples = %d\n" %(m, numTestSamples ) )
 
     xTraining = x
     yTraining = y
@@ -33,7 +33,7 @@ def SplitDatasetIntoTrainingAndTest( x, y, testPercentage ):
     for i in range (0, numTestSamples):
         row = np.random.randint( 0, m )
 
-        print ( row )
+        # print ( row )
 
         xTest[i:i+1:,] = xTraining[row:row+1:,]
         yTest[i:i+1:,] = yTraining[row:row+1:,]
@@ -55,7 +55,8 @@ def ScaleAndNormalise( v ):
 
     return (v, mean, sum )
 
-def GradientDescent( x, y, theta, regLambda, ComputeJ ):
+# def GradientDescent( x, y, theta, regLambda, ComputeJ ):
+def GradientDescent( x, y, theta, ComputeJ, ComputeH ):
 
     CheckDimensions( x, y )
 
@@ -66,12 +67,12 @@ def GradientDescent( x, y, theta, regLambda, ComputeJ ):
     m = x.shape[0]
     n = x.shape[1] - 1
 
-    # Set up lambda
-    l = np.ones( (n+1, 1) )
-    l[0][0] = 0
-    l = (regLambda/m) * l
+    # # Set up lambda
+    # l = np.ones( (n+1, 1) )
+    # l[0][0] = 0
+    # l = (regLambda/m) * l
 
-    j = ComputeJ( x, theta, y, m )
+    j = ComputeJ( x, theta, y )
     alpha = ALPHA_START
 
     jTrace = []
@@ -82,38 +83,40 @@ def GradientDescent( x, y, theta, regLambda, ComputeJ ):
     numIter = 0
     while 1:
 
-        ll = 1 - alpha * l
+        # ll = 1 - alpha * l
         h = ComputeH( x, theta )    # Linear Regression: np.matmul( x, theta)
         w = np.matmul( x.transpose(), h - y )
-        thetaNew = (ll * theta) - ( (alpha/m) * w )
-        jNew = ComputeJ( x, thetaNew, y, m )
+        # thetaNew = (ll * theta) - ( (alpha/m) * w )
+        thetaNew = - ((alpha / m) * w)
+        jNew = ComputeJ( x, thetaNew, y )
 
-        if ( jNew < j ):
+        # if ( jNew < j ):
+        #
+        #     # Update theta
+        #     theta = thetaNew
+        #
+        #     # Check for termination
+        #     if (  jNew < TERM_MIN_ERROR_RELATIVE_DELTA ) :
+        #         print( "Terminating after relative error decreasing below threshold.")
+        #         break
+        #
+        #     if ( numIter > TERM_MAX_ITERATIONS ) :
+        #         print( "Terminating after %d iterations." % numIter )
+        #         break
+        #
+        #     # alpha = alpha * 1.1
+        #
+        # else:
+        #
+        #     if ( alpha < ALPHA_MIN ):
+        #         # Time to quit
+        #         print( "Terminating after relative error started increasing with min alpha.")
+        #         break
+        #     else:
+        #         # Try smaller step
+        #         alpha = alpha * 0.5
 
-            # Update theta
-            theta = thetaNew
-
-            # Check for termination
-            if (  jNew < TERM_MIN_ERROR_RELATIVE_DELTA ) :
-                print( "Terminating after relative error decreasing below threshold.")
-                break
-
-            if ( numIter > TERM_MAX_ITERATIONS ) :
-                print( "Terminating after %d iterations." % numIter )
-                break
-
-            alpha = alpha * 1.1
-
-        else:
-
-            if ( alpha < ALPHA_MIN ):
-                # Time to quit
-                print( "Terminating after relative error started increasing with min alpha.")
-                break
-            else:
-                # Try smaller step
-                alpha = alpha * 0.5
-
+        theta = thetaNew
         j = jNew
         numIter = numIter + 1
 
@@ -121,6 +124,10 @@ def GradientDescent( x, y, theta, regLambda, ComputeJ ):
             jTrace.append( j )
             alphaTrace.append( alpha )
             numTraces = numTraces + 1
+
+        if ( numIter > TERM_MAX_ITERATIONS ) :
+            print( "Terminating after %d iterations." % numIter )
+            break
 
     if numTraces > 0:
         fig, axs = plt.subplots( 2, 1)
